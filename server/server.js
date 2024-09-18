@@ -50,13 +50,25 @@ app.get("/all-news", (req, res) => {
 
 //Top Headline
 
-app.options("/top-headlines", cors());
+app.options("/top-headlines", cors()); //The line app.options("/top-headlines", cors()) tells the server to explicitly handle OPTIONS requests for the /top-headlines route using the CORS middleware.
 app.get("/top-headline", (req, res) => {
   let pageSize = parseInt(req.query.pageSize) || 40;
   let page = parseInt(req.query.page) || 1;
   let category = req.query.category || "business";
 
   let url = `https://newsapi.org/v2/top-headlines?${category}&language=en&page=${page}&pageSize=${pageSize}&apiKey=${API_KEY}`;
+  fetchNews(url, res);
+});
+
+//country specific news
+
+app.options("/country/:iso", cors());
+app.get("/country/:iso", (req, res) => {
+  let page = parseInt(req.query.page) || 1;
+  let pageSize = parseInt(req.query.pageSize) || 80;
+
+  const country = req.params.iso;
+  let url = `https://newsapi.org/v2/top-headlines?country=${country}&apiKey=${API_KEY}&page=${page}&pageSize=${pageSize}`;
   fetchNews(url, res);
 });
 
