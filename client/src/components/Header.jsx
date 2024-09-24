@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import logo from './assets/logo/png'
-
+import countries from "./countries";
 
 function Header() {
     const [active, setActive] = useState(false);
@@ -41,6 +40,7 @@ function Header() {
                             Top Headline
                         </Link>
                     </li>
+
                     <ul className={showCategoryDropdown ? "dropdown p-2 show-dropdown" : "dropdown p-2"}>
                         {Countries.map((element, index) => (
                             <li key={index} onClick={() => setShowCategoryDropdown(!showCountryDropdown)}>
@@ -51,6 +51,7 @@ function Header() {
                             </li>
                         ))}
                     </ul>
+
                     <li>
                         <Link className="no-underline font-semibold" to="#" onClick={() => { toggleTheme }}>
                             <input type="checkbox" class="checkbox" id="checkbox" />
@@ -66,3 +67,5 @@ function Header() {
         </header>
     )
 }
+
+export default Header;
