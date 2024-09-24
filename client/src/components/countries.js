@@ -5,7 +5,7 @@ let twoLetterISO = [
     "ru", "sa", "se", "sg", "si", "sk", "th", "tr", "tw", "ua", "us", "ve", "za"
 ]
 
-//53:18
+
 var isoCountries = {
     'AF': 'Afghanistan',
     'AX': 'Aland Islands',

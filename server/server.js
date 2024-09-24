@@ -1,81 +1,78 @@
-require("dotenv").config(); //we use to make sure our sensitive information is not part of the codebase but stored in .env file
+require("dotenv").config();
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
-
 const app = express();
 
-app.use(cors()); //This allows our frontend to communicate with backend which might be running on different domain
-app.use(express.urlencoded({ extended: true })); //This line tells Express to parse incoming requests with URL-encoded payloads (form data, for example).
+// CORS configuration
+app.use(
+  cors({
+    origin: "*", // Be cautious with this in production
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
-const API_KEY = process.env.API_KEY; //To authenticate our request to the News API
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
-function fetchNews(url, res) {
-  axios
-    .get(url)
-    .then((response) => {
-      if (response.data.totalResults > 0) {
-        res.json({
-          status: 200,
-          success: true,
-          message: "Successfully fetched the data",
-          data: response.data,
-        });
-      } else {
-        res.json({
-          status: 200,
-          success: true,
-          message: "No more results to show",
-        });
-      }
-    })
-    .catch((error) => {
-      res.json({
-        status: 500, //server encountered a situation it doesn't know how to handle
-        success: false,
-        message: "Falied to fetch data",
-        error: error.message,
-      });
-    });
+// Helper function for API requests
+async function makeApiRequest(url) {
+  try {
+    const response = await axios.get(url);
+    return {
+      status: 200,
+      success: true,
+      message: "Successfully fetched the data",
+      data: response.data,
+    };
+  } catch (error) {
+    console.error(
+      "API request error:",
+      error.response ? error.response.data : error
+    );
+    return {
+      status: 500,
+      success: false,
+      message: "Failed to fetch data from the API",
+      error: error.response ? error.response.data : error.message,
+    };
+  }
 }
 
-// all news
-
-app.get("/all-news", (req, res) => {
-  let pageSize = parseInt(req.query.pageSize) || 40;
-  let page = parseInt(req.query.page) || 1;
-  let url = `https://newsapi.org/v2/everything?q=page=${page}&pageSize=${pageSize}&apiKey=${API_KEY}`;
-  fetchNews(url, res);
-});
-
-//Top Headline
-
-app.options("/top-headlines", cors()); //The line app.options("/top-headlines", cors()) tells the server to explicitly handle OPTIONS requests for the /top-headlines route using the CORS middleware.
-app.get("/top-headline", (req, res) => {
-  let pageSize = parseInt(req.query.pageSize) || 40;
-  let page = parseInt(req.query.page) || 1;
-  let category = req.query.category || "business";
-
-  let url = `https://newsapi.org/v2/top-headlines?${category}&language=en&page=${page}&pageSize=${pageSize}&apiKey=${API_KEY}`;
-  fetchNews(url, res);
-});
-
-//country specific news
-
-app.options("/country/:iso", cors());
-app.get("/country/:iso", (req, res) => {
-  let page = parseInt(req.query.page) || 1;
+app.get("/all-news", async (req, res) => {
   let pageSize = parseInt(req.query.pageSize) || 80;
+  let page = parseInt(req.query.page) || 1;
+  let q = req.query.q || "world"; // Default search query if none provided
 
-  const country = req.params.iso;
-  let url = `https://newsapi.org/v2/top-headlines?country=${country}&apiKey=${API_KEY}&page=${page}&pageSize=${pageSize}`;
-  fetchNews(url, res);
+  let url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(
+    q
+  )}&page=${page}&pageSize=${pageSize}&apiKey=${process.env.API_KEY}`;
+  const result = await makeApiRequest(url);
+  res.status(result.status).json(result);
 });
 
-//PORT
+app.get("/top-headlines", async (req, res) => {
+  let pageSize = parseInt(req.query.pageSize) || 80;
+  let page = parseInt(req.query.page) || 1;
+  let category = req.query.category || "general";
+
+  let url = `https://newsapi.org/v2/top-headlines?category=${category}&language=en&page=${page}&pageSize=${pageSize}&apiKey=${process.env.API_KEY}`;
+  const result = await makeApiRequest(url);
+  res.status(result.status).json(result);
+});
+
+app.get("/country/:iso", async (req, res) => {
+  let pageSize = parseInt(req.query.pageSize) || 80;
+  let page = parseInt(req.query.page) || 1;
+  const country = req.params.iso;
+
+  let url = `https://newsapi.org/v2/top-headlines?country=${country}&apiKey=${process.env.API_KEY}&page=${page}&pageSize=${pageSize}`;
+  const result = await makeApiRequest(url);
+  res.status(result.status).json(result);
+});
 
 const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
+app.listen(PORT, function () {
   console.log(`Server is running at port ${PORT}`);
 });

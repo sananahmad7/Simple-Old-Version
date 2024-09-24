@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import Card from './Card';
+import EverythingCard from './EverythingCard';
 import Loader from './Loader';
 
 function CountryNews() {
@@ -55,7 +55,7 @@ function CountryNews() {
                 {!isLoading ? (
                     data.length > 0 ? (
                         data.map((element, index) => (
-                            <Card
+                            <EverythingCard
                                 key={index}
                                 title={element.title}
                                 description={element.description}
