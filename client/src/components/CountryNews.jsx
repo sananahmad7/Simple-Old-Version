@@ -40,7 +40,7 @@ function CountryNews() {
                 }
             })
             .catch((error) => {
-                console.error('Fetch error:', error);
+                console.error('Fetch error:', error.message);
                 setError('Failed to fetch news. Please try again later.');
             })
             .finally(() => {

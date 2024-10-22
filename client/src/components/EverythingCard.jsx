@@ -3,6 +3,7 @@ import React from "react";
 function Card(props) {
     return (
         <div className="everything-card mt-10">
+
             <div className="everything-card flex flex-wrap p-5 gap-1 mb-1">
                 <b className="title">{props.title}</b>
                 <div className="everything-card-img mx-auto">
@@ -13,6 +14,7 @@ function Card(props) {
                         {props.description?.substring(0, 200)}
                     </p>
                 </div>
+
                 <div className="info">
                     <div className="source-info flex items-center gap-2">
                         <span className="font-semibold">Source:</span>
@@ -26,15 +28,16 @@ function Card(props) {
                     </div>
                     <div className="origin flex flex-col">
                         <p className="origin-item">
-                            <span className="font-semibold">Author:</span>
+                            <span className="font-semibold">Author: </span>
                             {props.author}
                         </p>
                         <p className="origin-item">
-                            <span className="font-semibold">Published At:</span>
+                            <span className="font-semibold">Published At: </span>
                             ({props.publishedAt})
                         </p>
                     </div>
                 </div>
+
             </div>
 
             {/* Added the new card content with styles */}
@@ -78,6 +81,7 @@ function Card(props) {
                     </div>
                 </div>
             </div>
+
         </div>
     );
 }

@@ -1,4 +1,4 @@
-require("dotenv").config();
+require("dotenv").config(); //for data in .env file to keep API hidden from readers in case of open source code
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
@@ -7,19 +7,23 @@ const app = express();
 // CORS configuration
 app.use(
   cors({
-    origin: "*", // Be cautious with this in production
+    origin: "*", //allows requests from any origin
     methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+/*app.use(express.urlencoded({ extended: true })) Does Parsing the Data: When you use this middleware, Express will automatically parse the URL-encoded data and convert it into a JavaScript object. 
+Populating req.body: After parsing, the data is stored in req.body. So if you submitted the example form, req.body would look like this:*/
 
-// Helper function for API requests
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json()); //makes JSON available in req.body
+
+//function is designed to make a request to an external API
 async function makeApiRequest(url) {
   try {
     const response = await axios.get(url);
+    //If the request is successful, the function returns an object containing
     return {
       status: 200,
       success: true,
@@ -40,6 +44,8 @@ async function makeApiRequest(url) {
   }
 }
 
+// For all news
+
 app.get("/all-news", async (req, res) => {
   let pageSize = parseInt(req.query.pageSize) || 80;
   let page = parseInt(req.query.page) || 1;
@@ -52,6 +58,8 @@ app.get("/all-news", async (req, res) => {
   res.status(result.status).json(result);
 });
 
+//For Top Headlines
+
 app.get("/top-headlines", async (req, res) => {
   let pageSize = parseInt(req.query.pageSize) || 80;
   let page = parseInt(req.query.page) || 1;
@@ -61,6 +69,8 @@ app.get("/top-headlines", async (req, res) => {
   const result = await makeApiRequest(url);
   res.status(result.status).json(result);
 });
+
+//For news from a specific counrty
 
 app.get("/country/:iso", async (req, res) => {
   let pageSize = parseInt(req.query.pageSize) || 80;
